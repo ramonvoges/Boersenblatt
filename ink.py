@@ -53,9 +53,11 @@ def count_lines(xml_soup):
 
 
 def collect_data():
-    data = []
+    data = {'filename': [],
+            'blocks': [],
+            'lines': []}
     for name, xml_soup in load_files():
-        blocks = count_blocks(xml_soup)
-        lines = count_lines(xml_soup)
-        data.append({'blocks': blocks, 'lines': lines})
+        data['filename'].append(name)
+        data['blocks'].append(count_blocks(xml_soup))
+        data['lines'].append(count_lines(xml_soup))
     return data
