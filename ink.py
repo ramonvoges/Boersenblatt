@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 
 from urllib.request import urlopen
 from bs4 import BeautifulSoup as soup
@@ -61,3 +62,13 @@ def collect_data():
         data['blocks'].append(count_blocks(xml_soup))
         data['lines'].append(count_lines(xml_soup))
     return data
+    
+def save_data():
+    data = collect_data()
+    df = pd.DataFrame(data)
+    df.to_csv('data.csv')
+    print("Daten gesichert in: data.csv")
+    #with open('data.csv', 'w') as f:
+        #w = csv.DictWriter(f, data.keys())
+        #w.writeheader()
+        #w.writerow(data)
