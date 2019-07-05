@@ -41,17 +41,17 @@ def load_files():
 
 def count_blocks(xml_soup):
     blocks = xml_soup.find_all('TextBlock')
-    nr_blocks = len(blocks)
-    return nr_blocks
+    if not blocks:
+    	return 0
+    else:
+    	return len(blocks)
 
 def count_lines(xml_soup):
     lines = xml_soup.find_all('TextLine')
-    nr_lines = len(lines)
-    return nr_lines
-
-# def page(xml_soup):
-    # page_nr = xml_soup.find
-
+    if not lines:
+        return 0
+    else:
+        return len(lines)
 
 def collect_data():
     data = {'filename': [],
