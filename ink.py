@@ -19,8 +19,8 @@ def download_pages():
             counter = 0
             fulltext = xml_soup.find_all("mets:file", {'MIMETYPE': "text/xml"})
             for link in fulltext:
-                url = link.find('mets:FLocat')['xlink:href'])
-                print("Lade herunter: {}".format(url)
+                url = link.find('mets:FLocat')['xlink:href']
+                print("Lade herunter: {}".format(url))
                 counter += 1
                 file_name = "{}-{:05d}.xml".format(slub_id, counter)
                 xml_download = urlopen(url)
@@ -30,11 +30,12 @@ def download_pages():
                     f.write(xml_suppe.prettify())
             
 
-def load_files():
-    files = '/home/dbsm-user/data/Skripte/data/Börsenblatt/Einzelseiten/*.xml'
+def load_files(year):
+    files = "/home/dbsm-user/data/Skripte/data/Börsenblatt/Einzelseiten/39946221X-{}*.xml".format(year)
     for xml_file in glob(files):
         with open(xml_file) as f:
             name = f.name
+            print("Lade Daten aus Datei {}".format(name))
             xml = f.read()
             xml_soup = soup(xml, 'xml')
             yield name, xml_soup
@@ -53,26 +54,26 @@ def count_lines(xml_soup):
     else:
         return len(lines)
 
-def collect_data():
+def collect_data(year):
     data = {'filename': [],
             'blocks': [],
             'lines': []}
-    for name, xml_soup in load_files():
+    for name, xml_soup in load_files(year):
         data['filename'].append(name)
         data['blocks'].append(count_blocks(xml_soup))
         data['lines'].append(count_lines(xml_soup))
     return data
     
-def save_data():
-    data = collect_data()
+def save_data(year):
+    data = collect_data(year)
     df = pd.DataFrame(data)
-    df.to_csv('data.csv')
-    print("Daten gesichert in: data.csv")
+    df.to_csv("data{}.csv".format(year))
+    print("Daten gesichert in: data{}.csv".format(year))
     #with open('data.csv', 'w') as f:
         #w = csv.DictWriter(f, data.keys())
         #w.writeheader()
         #w.writerow(data)
 
-def load_csv():
-    df = pd.read_csv('data.csv')
+def load_csv(year):
+    df = pd.read_csv("data{}.csv".format(year))
     return df
