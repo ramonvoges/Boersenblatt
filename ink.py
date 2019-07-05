@@ -5,6 +5,8 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup as soup
 from glob import glob
 
+import plotly.offline as py
+import plotly.graph_objs as go
 
 
 def download_pages():
@@ -34,7 +36,7 @@ def load_files(year):
     files = "/home/dbsm-user/data/Skripte/data/Börsenblatt/Einzelseiten/39946221X-{}*.xml".format(year)
     for xml_file in glob(files):
         with open(xml_file) as f:
-            name = f.name
+            name = os.path.basename(f.name)
             print("Lade Daten aus Datei {}".format(name))
             xml = f.read()
             xml_soup = soup(xml, 'xml')
@@ -67,7 +69,7 @@ def collect_data(year):
 def save_data(year):
     data = collect_data(year)
     df = pd.DataFrame(data)
-    df.to_csv("data{}.csv".format(year))
+    df.to_csv("data/{}.csv".format(year))
     print("Daten gesichert in: data{}.csv".format(year))
     #with open('data.csv', 'w') as f:
         #w = csv.DictWriter(f, data.keys())
@@ -75,5 +77,12 @@ def save_data(year):
         #w.writerow(data)
 
 def load_csv(year):
-    df = pd.read_csv("data{}.csv".format(year))
+    df = pd.read_csv("data/{}.csv".format(year))
     return df
+
+def plot(year):
+    df = load_csv(year)
+    blocks = go.Bar(x=list(df['filename']), y=list(df['blocks']))
+    lines = go.Bar(x=list(df['filename']), y=list(df['lines']))
+    data = [blocks, lines]
+    py.plot(data, filename="html/{}.html".format(year), auto_open=True)
