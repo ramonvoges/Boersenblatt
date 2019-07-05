@@ -72,3 +72,7 @@ def save_data():
         #w = csv.DictWriter(f, data.keys())
         #w.writeheader()
         #w.writerow(data)
+
+def load_csv():
+    df = pd.read_csv('data.csv')
+    return df
