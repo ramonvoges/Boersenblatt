@@ -10,6 +10,8 @@ import plotly.graph_objs as go
 
 
 def download_pages():
+    """Download the ALTO data form the given METS files and saves them in the
+    output path."""
     files = '/home/dbsm-user/data/Skripte/data/Börsenblatt/bbl-mets-data-20190703/*.mets'
     for mets in glob(files):
         print(mets)
@@ -30,9 +32,12 @@ def download_pages():
                 with open("/home/dbsm-user/data/Skripte/data/Börsenblatt/Einzelseiten/{}".format(file_name), 'w') as f:
                     print("Schreibe {}".format(file_name))
                     f.write(xml_suppe.prettify())
-            
+
+
 
 def load_files(year):
+    """Load the XML files with ALTA data and provide a tuple with the filename
+    and a BeautifulSoup object."""
     files = "/home/dbsm-user/data/Skripte/data/Börsenblatt/Einzelseiten/39946221X-{}*.xml".format(year)
     for xml_file in glob(files):
         with open(xml_file) as f:
@@ -42,21 +47,28 @@ def load_files(year):
             xml_soup = soup(xml, 'xml')
             yield name, xml_soup
 
+
 def count_blocks(xml_soup):
+    """Count the TextBlock tags."""
     blocks = xml_soup.find_all('TextBlock')
     if not blocks:
-    	return 0
+        return 0
     else:
-    	return len(blocks)
+        return len(blocks)
+
 
 def count_lines(xml_soup):
+    """Count the TextLine tags."""
     lines = xml_soup.find_all('TextLine')
     if not lines:
         return 0
     else:
         return len(lines)
 
+
 def collect_data(year):
+    """Collect the filenames, blocks and lines of a given <year> in a dict of
+    lists."""
     data = {'filename': [],
             'blocks': [],
             'lines': []}
@@ -65,8 +77,10 @@ def collect_data(year):
         data['blocks'].append(count_blocks(xml_soup))
         data['lines'].append(count_lines(xml_soup))
     return data
-    
+
+
 def save_data(year):
+    """Save the data for a given <year> in a corresponding csv file."""
     data = collect_data(year)
     df = pd.DataFrame(data)
     df.to_csv("data/{}.csv".format(year))
@@ -76,11 +90,15 @@ def save_data(year):
         #w.writeheader()
         #w.writerow(data)
 
+
 def load_csv(year):
+    """Load the csv file for a given <year>."""
     df = pd.read_csv("data/{}.csv".format(year))
     return df
 
+
 def plot(year):
+    """Plot the data for a given <year>."""
     df = load_csv(year)
     blocks = go.Bar(x=list(df['filename']), y=list(df['blocks']))
     lines = go.Bar(x=list(df['filename']), y=list(df['lines']))
